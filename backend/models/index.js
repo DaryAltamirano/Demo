@@ -1,20 +1,80 @@
-const Sequelize = require("sequelize");
+const { Sequelize, Model, DataTypes } = require("sequelize");
 
-const sequelize = new Sequelize(DATABASE, USER, PASSWORD, {
-    host: HOST,
-    dialect: mysql,
-    operatorsAliases: false,
-  
-    pool: {
-      max: 5,     
-      min: 0,     
-      idle: 10000
-    }
-  });
-  
-  const db = {};
-  db.Sequelize = Sequelize;
-  db.sequelize = sequelize;
-  db.user = require("./user.js")(sequelize, Sequelize);
-  db.user = require("./token.js")(sequelize, Sequelize);
-  module.exports = db;
+const  { sequelize } = require("./connection.js");
+class User extends Model { }
+
+User.init(
+  {
+    user_id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    user_name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+    },
+    birthday_date: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    modelName: "User",
+  }
+);
+
+class Token extends Model { }
+
+Token.init(
+  {
+    token_id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    token: {
+      type: Sequelize.INTEGER(8)
+    },
+    created_AT: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
+    expirate_AT: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
+    duration: {
+      type: Sequelize.SMALLINT,
+      defaultValue: 60,
+    },
+    active: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: 60,
+    },
+    user_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'user_id',
+      },
+    },
+  },
+  {
+    sequelize,
+    modelName: "Token",
+  }
+);
+
+User.hasMany(Token, { foreignKey: 'user_id' });
+
+module.exports = {
+  User,
+  Token,
+};

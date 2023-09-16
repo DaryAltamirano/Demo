@@ -1,17 +1,16 @@
 version: '3'
 services:
-  app: 
-    image: nodeimage
+  backend: 
     container_name: server
-    build: ./backend
+    env_file:
+      - ./backend/.env.example
+    build: 
+       context: ./backend
+    working_dir: /app
     ports:
       - "3000:3000"
     volumes:
       - ./:/app
-
-    environment:
-      - PORT=3000
-      - HOST=0.0.0.0
   db:
     container_name: mysql
     image: mysql:8
