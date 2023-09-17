@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const crypto = require('crypto');
 
-const { User, Token } = require('../models/index.js');
+const { User } = require('../models/index.js');
 
 router.get("/users", async (req, res) => {
     const users = await User.findAll();
@@ -60,9 +60,9 @@ router.put("/users/:user_id", async (req, res) => {
             },
         }
     );
-
     res.status(200).json({
         status: userUpdate,
+        body: userUpdate,
         ok: true,
     });
 });

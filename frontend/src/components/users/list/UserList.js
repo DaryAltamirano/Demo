@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import React, { useState, useEffect } from 'react';
 import { GetRequest, PostRequest, DeleteRequest, PutRequest } from '../../../common/api';
+import { Link } from 'react-router-dom';
 
 function UserList() {
 
@@ -32,28 +33,29 @@ function UserList() {
             .catch((error) => console.error(error));
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         const form = event.currentTarget;
         event.preventDefault();
         event.stopPropagation();
 
         if (form.checkValidity()) {
 
-            if (newUser){
-                PostRequest('users', formData)
-                .then((responseData) => {
-                    setUserList([...userList, responseData.body]);
-                    setFormData({ name: '', user_name: '', birthday_date: '' });
-                })
-                .catch((error) => console.error(error));
+            if (newUser) {
+                await PostRequest('users', formData)
+                    .then((responseData) => {
+                        setFormData({ user_id: '', name: '', user_name: '', birthday_date: '' });
+                    })
+                    .catch((error) => console.error(error));
             } else {
-                PutRequest(`users/${formData.user_id}`, formData)
-                .then((responseData) => {
-                    setUserList([...userList, responseData.body]);
-                    setFormData({ name: '', user_name: '', birthday_date: '' });
-                })
-                .catch((error) => console.error(error));
+                await PutRequest(`users/${formData.user_id}`, formData)
+                    .then((responseData) => {
+                        setFormData({ user_id: '', name: '', user_name: '', birthday_date: '' });
+                    })
+                    .catch((error) => console.error(error));
             }
+            GetRequest('users')
+                .then((responseData) => setUserList(responseData.body))
+                .catch((error) => console.error(error));
             setShow(false);
 
             return
@@ -64,18 +66,20 @@ function UserList() {
     const handleClose = () => setShow(false);
 
     const handleShow = (user) => {
-        setShow(true) 
-        if (user != null)  {
-            setFormData(user)
-        }else { 
-            setFormData({
-                name: '',
-                user_name: '',
-                birthday_date: '',
-            }) 
-            setNewUser(true)
-        }
+        console.log(user)
+        setFormData(user);
+        setShow(true);
 
+        setNewUser(user.name === '');
+
+    }
+    const converseDate = (date) => {
+        const fechaOriginal = new Date(date);
+        const dia = fechaOriginal.getUTCDate();
+        const mes = fechaOriginal.getUTCMonth() + 1;
+        const anio = fechaOriginal.getUTCFullYear();
+
+        return `${anio}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
     }
 
     useEffect(() => {
@@ -88,7 +92,7 @@ function UserList() {
         <>
             <div className='container mt-5'>
                 <div className='d-flex justify-content-end mb-4'>
-                    <Button variant="primary" onClick={handleShow}>
+                    <Button variant="primary" onClick={() => handleShow({ user_id: '', name: '', user_name: '', birthday_date: '' })}>
                         Create User
                     </Button>
                 </div>
@@ -111,9 +115,13 @@ function UserList() {
                                 <td>{user.user_id}</td>
                                 <td>{user.name}</td>
                                 <td>{user.user_name}</td>
-                                <td>{new Date(user.birthday_date).toLocaleDateString()}</td>
+                                <td>{converseDate(user.birthday_date)}</td>
                                 <td className="d-flex justify-content-center">
-                                    <Button variant="warning"  onClick={() => handleShow(user)} >Edit</Button>
+                                    <Link to={`/token/list/${user.user_id}`}>
+                                        <Button variant="info" className="mx-2">Tokens</Button>
+                                    </Link>
+
+                                    <Button variant="warning" onClick={() => handleShow(user)} >Edit</Button>
                                     <Button variant="danger" className="mx-2" onClick={() => deleteElement(user.user_id)}>Delete</Button>
                                 </td>
                             </tr>
@@ -160,7 +168,7 @@ function UserList() {
                                 <Form.Label>Birthday Date</Form.Label>
                                 <Form.Control
                                     type="date"
-                                    value={formData.birthday_date}
+                                    value={converseDate(formData.birthday_date)}
                                     name="birthday_date"
                                     onChange={handleInputChange}
                                     autoFocus

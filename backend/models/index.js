@@ -53,9 +53,9 @@ Token.init(
       type: Sequelize.SMALLINT,
       defaultValue: 60,
     },
-    active: {
+    used: {
       type: Sequelize.BOOLEAN,
-      defaultValue: 60,
+      defaultValue: 1,
     },
     user_id: {
       type: DataTypes.UUID,
