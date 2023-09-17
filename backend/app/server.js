@@ -2,14 +2,14 @@
 
 const express = require('express')
 const morgan = require("morgan")
-
+const cors = require('cors');
 const config = require('../config/config.js')
 const router = require("../routers/index.js")
 
 const app = express()
 
 app.use(morgan("dev"))
-
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
