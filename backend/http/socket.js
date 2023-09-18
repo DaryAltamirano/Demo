@@ -2,10 +2,12 @@
 
 const socketIo = require('socket.io');
 const { createToken, findNoUsedTokensByUserId } = require('../services/services.js');
+const config = require('../config/config.js')
+
 module.exports = (server) => {
   const io = socketIo(server, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: config.ORIGIN_SOCKET,
       methods: ['GET', 'POST'],
     },
   });
@@ -22,7 +24,6 @@ module.exports = (server) => {
         .catch((error) => console.error(error));
 
       intervalId = setInterval(() => {
-        console.log(intervalId)
         if ((Array.isArray(tokensArray) && tokensArray.length === 0) || second >= 60) {
           token = getVirtualToken()
           createToken(user_id, token)
@@ -34,7 +35,6 @@ module.exports = (server) => {
             .then((tokens) => tokensArray = tokens)
             .catch((error) => console.error(error));
           second = 0;
-          console.log(second)
         } else {
           const time = Math.floor((new Date() - tokensArray[0].dataValues.created_AT) / 1000);
           result = {
@@ -49,7 +49,6 @@ module.exports = (server) => {
     });
 
     socket.on('disconnect', () => {
-      console.log(intervalId)
       clearInterval(intervalId);
       console.log('Close Connection');
     });
@@ -57,5 +56,9 @@ module.exports = (server) => {
 };
 
 function getVirtualToken() {
-  return Math.floor(Math.random() * 1000000);
+
+  const min = 100000;
+  const max = 1000000;
+  
+  return Math.floor(Math.random() * (max - min)) + min;
 }

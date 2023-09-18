@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:4000/api/v1';
+const BASE_URL = process.env.BACKEND_URL_API || 'http://localhost:4000/api/v1';;
 
 async function GetRequest(endpoint) {
   const response = await fetch(`${BASE_URL}/${endpoint}`);

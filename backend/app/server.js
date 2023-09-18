@@ -10,13 +10,12 @@ const http = require('http');
 const app = express()
 
 app.use(morgan("dev"))
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: config.ORIGIN_REQUEST }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
-  res.send('Hello people')
 })
 
 app.use("/api/v1", usersRouter)

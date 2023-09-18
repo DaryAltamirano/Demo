@@ -1,16 +1,32 @@
 version: '3'
 services:
   backend: 
-    container_name: server
+    container_name: backend
     env_file:
       - ./backend/.env.example
     build: 
        context: ./backend
     working_dir: /app
     ports:
+      - "4000:4000"
+    networks:
+      - demo
+    depends_on:
+      - db
+
+      
+  frontend: 
+    container_name: frontend
+    env_file:
+      - ./frontend/.env.example
+    build: 
+       context: ./frontend
+    working_dir: /app
+    ports:
       - "3000:3000"
-    volumes:
-      - ./:/app
+    networks:
+      - demo
+
   db:
     container_name: mysql
     image: mysql:8
@@ -21,7 +37,13 @@ services:
     environment:
       MYSQL_DATABASE: test
       MYSQL_ROOT_PASSWORD: root
+    networks:
+      - demo
     volumes:
       -  mysql-data:/var/lib/mysql
 volumes:
   mysql-data:
+
+networks:
+  demo:
+    driver: bridge

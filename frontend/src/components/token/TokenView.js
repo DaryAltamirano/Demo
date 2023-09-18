@@ -6,7 +6,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
-const SERVER_URL = 'http://localhost:4000';
+const SERVER_URL = process.env.BACKEND_URL_SOCKET || 'http://localhost:4000';
 
 function TokenView() {
   const [virtualToken, setVirtualToken] = useState(0);

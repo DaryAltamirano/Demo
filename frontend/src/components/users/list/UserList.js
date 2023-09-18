@@ -66,7 +66,6 @@ function UserList() {
     const handleClose = () => setShow(false);
 
     const handleShow = (user) => {
-        console.log(user)
         setFormData(user);
         setShow(true);
 
@@ -91,6 +90,8 @@ function UserList() {
     return (
         <>
             <div className='container mt-5'>
+                <h2> User List</h2>
+
                 <div className='d-flex justify-content-end mb-4'>
                     <Button variant="primary" onClick={() => handleShow({ user_id: '', name: '', user_name: '', birthday_date: '' })}>
                         Create User
